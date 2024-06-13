@@ -3,10 +3,13 @@ from django.shortcuts import render, redirect, HttpResponseRedirect
 from .services.repository.ProdutoRepository import ProductModel
 from django.http import JsonResponse
 from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth import authenticate, login as auth_login
 from django.urls import reverse
 from Ferteliz import settings
 from core.models import UserModel, ProductModel
 from .forms import UserForm, ProductForm
+from django.contrib.auth.models import User
+from django.conf import settings
 
 # Create your views here.
 def home (request):
@@ -40,25 +43,31 @@ def cadastroCliente(request):
     contexto = {'form': form}
     return render(request, template_name, contexto)
 
-
 def login(request):
     template_name = 'login.html'
+    db = settings.db  # Obtenha a instância do banco de dados MongoDB
     
     if request.method == 'POST':
-        # username = request.POST['username']
         cpf = request.POST['cpf']
         password = request.POST['password']
-        
-        # Autenticar o usuário
-        user = authenticate(request, username=cpf, password=password)
-        if user is not None:
-            login(request, user)
-            return redirect('home')
+
+        # Autenticar o usuário manualmente
+        user = db.users.find_one({"cpf": cpf, "password": password})
+        if user:
+            # Usar o User model do Django para login
+            django_user = authenticate(request, username=cpf, password=password)
+            if django_user is not None:
+                auth_login(request, django_user)
+                return redirect('home')
+            else:
+                # Criar um usuário Django se não existir
+                django_user = User.objects.create_user(username=cpf, password=password)
+                django_user.save()
+                auth_login(request, django_user)
+                return redirect('home')
         else:
-            # Caso o usuário insira informações erradas
-            messages.info(request, 'CPF ou senha incorretos.')
-            return render(request, template_name)
-            # return render(request, template_name, {'error': 'Invalid credentials'})
+            messages.error(request, 'CPF ou senha incorretos.')
+
     return render(request, template_name)
 
 def logout(request):
