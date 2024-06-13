@@ -9,12 +9,15 @@ from .forms import UserForm, ProductForm
 
 # Create your views here.
 def home (request):
-    return render(request, 'home.html')
+    template_name = 'home.html'
+    return render(request, template_name)
 
 def cadastroMenu (request):
     return render(request, 'cadastroMenu.html')
 
 def cadastroCliente(request):
+    template_name = 'cadastroCliente.html'
+    
     if request.method == 'POST':
         form = UserForm(request.POST)
         if form.is_valid():
@@ -24,9 +27,11 @@ def cadastroCliente(request):
     else:
         form = UserForm()
         contexto = {'form': form}
-        return render(request, 'cadastroCliente.html', contexto)
+        return render(request, template_name, contexto)
 
 def login(request):
+    template_name = 'login.html'
+    
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
@@ -35,29 +40,36 @@ def login(request):
             login(request, user)
             return redirect('home')
         else:
-            return render(request, 'login.html', {'error': 'Invalid credentials'})
-    return render(request, 'login.html')
+            return render(request, template_name, {'error': 'Invalid credentials'})
+    return render(request, template_name)
 
 def cadastroVendedor(request):
-    return render(request, 'cadastroVendedor.html') 
+    template_name = 'cadastroVendedor.html'
+    return render(request, template_name) 
 
 def carrinho(request):
-    return render(request, 'carrinho.html') 
+    template_name = 'carrinho.html'
+    return render(request, template_name) 
 
 def cadastroProdutos(request):
-    return render(request, 'cadastroProdutos.html') 
+    template_name = 'cadastroProdutos.html'
+    return render(request, template_name) 
 
 def homeCliente(request):
-    return render(request, 'homeCliente.html') 
+    template_name = 'homeCliente.html'
+    return render(request, template_name) 
 
 def homeVendedor(request):
-    return render(request, 'homeVendedor.html')
+    template_name = 'homeVendedor.html'
+    return render(request, template_name)
 
 def profileVendedor(request):
-    return render(request, 'profileVendedor.html')
+    template_name = 'profileVendedor.html'
+    return render(request, template_name)
 
 def profileCliente(request):
-    return render(request, 'profileCliente.html')
+    template_name = 'profileCliente.html'
+    return render(request, template_name)
 
 def list_products (request):
     products = ProductModel.objects.all()
@@ -72,6 +84,8 @@ def list_products (request):
     #return render(request, 'list_products.html')
 
 def add_product(request):
+    template_name = 'add_product.html'
+    
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES)
         if form.is_valid():
@@ -83,6 +97,6 @@ def add_product(request):
             return JsonResponse({'status': 'Formulário inválido', 'errors': errors}, status=400)
     else:
         form = ProductForm()
-    return render(request, 'add_product.html', {'form': form})
+    return render(request, template_name, {'form': form})
 
 
