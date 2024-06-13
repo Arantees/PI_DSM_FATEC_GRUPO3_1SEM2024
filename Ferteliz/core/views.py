@@ -1,7 +1,8 @@
+from django.contrib import messages
 from django.shortcuts import render, redirect, HttpResponseRedirect
 from .services.repository.ProdutoRepository import ProductModel
 from django.http import JsonResponse
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout
 from django.urls import reverse
 from Ferteliz import settings
 from core.models import UserModel, ProductModel
@@ -21,27 +22,49 @@ def cadastroCliente(request):
     if request.method == 'POST':
         form = UserForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-            return redirect('home')
+            try:
+                user = form.save()
+                login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+                return redirect('home')
+            except Exception as e:
+                # Capture qualquer exceção para diagnóstico
+                messages.error(request, "Erro ao cadastrar usuário. Por favor, contate o suporte do sistema para assistência.")
+                # Logar a exceção para ajudar no diagnóstico
+                print(f"Erro ao cadastrar usuário: {e}")
+        else:
+            messages.error(request, "Erro no formulário. Por favor, verifique os campos e tente novamente.")
+    
     else:
         form = UserForm()
-        contexto = {'form': form}
-        return render(request, template_name, contexto)
+
+    contexto = {'form': form}
+    return render(request, template_name, contexto)
+
 
 def login(request):
     template_name = 'login.html'
     
     if request.method == 'POST':
-        username = request.POST['username']
+        # username = request.POST['username']
+        cpf = request.POST['cpf']
         password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
+        
+        # Autenticar o usuário
+        user = authenticate(request, username=cpf, password=password)
         if user is not None:
             login(request, user)
             return redirect('home')
         else:
-            return render(request, template_name, {'error': 'Invalid credentials'})
+            # Caso o usuário insira informações erradas
+            messages.info(request, 'CPF ou senha incorretos.')
+            return render(request, template_name)
+            # return render(request, template_name, {'error': 'Invalid credentials'})
     return render(request, template_name)
+
+def logout(request):
+    """Faz logout do usuário."""
+    logout(request)
+    return HttpResponseRedirect(reverse('home'))
 
 def cadastroVendedor(request):
     template_name = 'cadastroVendedor.html'
@@ -98,5 +121,3 @@ def add_product(request):
     else:
         form = ProductForm()
     return render(request, template_name, {'form': form})
-
-

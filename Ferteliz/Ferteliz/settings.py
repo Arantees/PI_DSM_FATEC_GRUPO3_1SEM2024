@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'core'
+    'core',
 ]
 
 MIDDLEWARE = [
@@ -72,6 +72,16 @@ TEMPLATES = [
         },
     },
 ]
+
+from django.contrib import messages
+
+MESSAGE_TAGS = {
+    messages.DEBUG: 'alert-info',
+    messages.INFO: 'alert-info',
+    messages.SUCCESS: 'alert-success',
+    messages.WARNING: 'alert-warning',
+    messages.ERROR: 'alert-danger',
+}
 
 WSGI_APPLICATION = 'Ferteliz.wsgi.application'
 
@@ -124,14 +134,14 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'pt-br'
 
 LANGUAGES = [
     ("en", _("English")),
     ("pt", _("Portuguese")),
 ]
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Sao_Paulo'
 
 USE_I18N = True
 
@@ -159,10 +169,17 @@ AUTH_USER_MODEL = 'core.UserModel'
 
 APPEND_SLASH = True
 
-# Caso o usuário nao esteja logado
+# Configuração de autenticação
 LOGIN_URL = 'login'
 
-LOGINREDIRECT_URL = 'home'
+# Redireciona usuário após login
+LOGIN_REDIRECT_URL = 'home'
+
+# Redireciona usuário após logout
+LOGOUT_REDIRECT_URL = 'login'
+
+# Adiciona '/' no final dos urls que não o tiverem
+APPEND_SLASH = True
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
