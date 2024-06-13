@@ -4,6 +4,7 @@ from .services.repository.ProdutoRepository import ProductModel
 from django.http import JsonResponse
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth import authenticate, login as auth_login
+from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.urls import reverse
 from Ferteliz import settings
 from core.models import UserModel, ProductModel
@@ -17,7 +18,8 @@ def home (request):
     return render(request, template_name)
 
 def cadastroMenu (request):
-    return render(request, 'cadastroMenu.html')
+    template_name = 'cadastroMenu.html'
+    return render(request, template_name)
 
 def cadastroCliente(request):
     template_name = 'cadastroCliente.html'
@@ -72,7 +74,7 @@ def login(request):
 
 def logout(request):
     """Faz logout do usuário."""
-    logout(request)
+    auth_logout(request)
     return HttpResponseRedirect(reverse('home'))
 
 def cadastroVendedor(request):
@@ -113,7 +115,6 @@ def list_products (request):
             'price': str(product.price)
         })
     return JsonResponse(data, safe=False)
-    #return render(request, 'list_products.html')
 
 def add_product(request):
     template_name = 'add_product.html'
